@@ -1,0 +1,72 @@
+
+===========================
+ FLOW: HAND GESTURE MOUSE CONTROL
+===========================
+
+I. KHỞI TẠO HỆ THỐNG
+---------------------------
+1. Import thư viện: cv2, mediapipe, pyautogui, threading, deque
+2. Cấu hình:
+   - filter_mode: mean / ema / none
+   - ema_alpha: độ phản hồi bộ lọc EMA
+   - delta_threshold: ngưỡng rung
+   - click_cooldown: thời gian chờ giữa các lần click
+3. Tạo mô hình GestureRecognizer từ MediaPipe
+4. Tạo thread xử lý song song click_processing()
+
+
+II. XỬ LÝ MỖI FRAME (main loop)
+---------------------------
+1. Đọc frame từ camera
+2. Resize, chuyển RGB
+3. Gửi vào recognizer → nhận kết quả:
+   - hand_landmarks_result
+   - handedness_result
+   - gestures_result
+4. Gửi frame vào global_click_frame để xử lý
+5. Vẽ landmarks lên ảnh và hiển thị bằng cv2.imshow()
+
+
+III. XỬ LÝ LOGIC TRONG click_processing()
+---------------------------
+1. Ghim FPS bằng time.sleep nếu cần
+2. Duyệt tất cả tay để kiểm tra:
+   - Nếu có tay trái đang gesture == "victory"
+       → mouse_locked = True
+   - Nếu không có tay trái victory
+       → mouse_locked = False
+
+3. Với mỗi tay:
+
+   Tay trái:
+   ----------
+   - open_palm → center chuột & reset filter
+   - closed_fist → click chuột trái
+   - thumb_up → cuộn lên
+   - thumb_down → cuộn xuống
+   - victory → KÍCH HOẠT GIỮ CHUỘT (set mouse_locked = True)
+
+   Tay phải:
+   ----------
+   - Nếu mouse_locked = False:
+       → Lấy vị trí ngón trỏ
+       → Tính delta
+       → Áp dụng bộ lọc: mean / ema
+       → Nếu vượt delta_threshold → move chuột bằng pyautogui.moveTo()
+
+   - Nếu mouse_locked = True:
+       → Bỏ qua xử lý chuột (giữ yên vị trí)
+
+
+IV. THOÁT CHƯƠNG TRÌNH
+---------------------------
+- Bấm phím 'q' để dừng chương trình, giải phóng camera và đóng cửa sổ hiển thị
+
+===========================
+TÍNH NĂNG ĐÃ CÓ
+===========================
+- ✅ Điều khiển chuột mượt bằng tay phải
+- ✅ Các hành động tay trái: click, scroll, center
+- ✅ Giữ chuột đứng yên bằng gesture ✌️ "Victory"
+- ✅ Chọn lọc EMA / Mean / None tùy chọn
+- ✅ Ghim FPS ổn định (30 FPS)
