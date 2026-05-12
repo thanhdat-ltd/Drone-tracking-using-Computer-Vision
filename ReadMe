@@ -1,0 +1,40 @@
+Để có thể khởi chạy chương trình mô phỏng ta bắt buộc cần có isaacSim và isaacLab
+Kích thước của IsaacSim và IsaacLab: ~25GB (chưa kể assets)
+
+source code demo.py nằm ở <path>\uav\pid_control\demo.py
+trước tiên ta khởi chạy trên CMD:
+
+nvidia-smi
+#Phiên bản driver cần thiết: >= 535.x
+# Nếu chưa có, cài tại: https://www.nvidia.com/drivers
+
+#Tạo môi trường
+conda create -n env_isaaclab python=3.11
+conda activate env_isaaclab
+
+#Cài đặt Pytorch với CUDA (Ubuntu 24.04)
+pip install --upgrade pip
+pip install -U torch==2.7.0 torchvision==0.22.0 --index-url https://download.pytorch.org/whl/cu128
+#Dành cho Window
+python -m pip install --upgrade pip
+pip install -U torch==2.7.0 torchvision==0.22.0 --index-url https://download.pytorch.org/whl/cu128
+
+# Cài Isaac Sim 5.1.0
+pip install "isaacsim[all,extscache]==5.1.0" --extra-index-url https://pypi.nvidia.com
+
+#Cài IsaacLab
+git clone https://github.com/isaac-sim/IsaacLab.git
+cd IsaacLab
+# Cài đặt IsaacLab (Ubuntu)
+./isaaclab.sh --install
+
+# Cài đặt IsaacLab (Windows)
+isaaclab.bat --install
+pip install -e source/isaaclab*
+
+#Bây giờ ta đặt thư mục <uav> vào thư mục đường dẫn: <C:Path>\IsaacLab\source\isaaclab_assets\isaaclab_assets
+
+#Chạy code:
+isaacsim_env\Scripts\activate
+cd isaaclab
+isaaclab.bat -p <Path>\demo.py
